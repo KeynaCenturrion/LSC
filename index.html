@@ -68,7 +68,7 @@
             bottom: 3vh;
             left: 2vw;
             z-index: 2;
-            max-width: 20vw;
+            max-width: 40vw;
         }
 
         #HintTitle {
@@ -93,9 +93,9 @@
             left: 50%;
             transform: translate(-50%,-50%);
             z-index: 3;
-            width: 40vw;
-            max-width: 600px;
-            min-width: 200px;
+            width: 100vw;
+            max-width: 570px;
+            min-width: 260px;
             text-align: center;
             color: #fff;
         }
@@ -104,19 +104,13 @@
             font-size: clamp(14px,1.3vw,18px);
             letter-spacing: .08em;
             text-transform: uppercase;
-            margin-bottom: 1.2vh;
+            margin-bottom: 1.6vh;
             text-shadow: 0 0 6px rgba(0,0,0,.8);
-        }
-
-        #ProcessPercent {
-            font-size: clamp(20px,2.3vw,32px);
-            margin-bottom: 2vh;
-            text-shadow: 0 0 8px rgba(0,0,0,.9);
         }
 
         #ProcessBar {
             width: 100%;
-            height: 8px;
+            height: 15px;
             border-radius: 999px;
             background: rgba(255,255,255,.12);
             overflow: hidden;
@@ -124,11 +118,22 @@
         }
 
         #ProcessBarFill {
-            width: 0%;
+            width: 50%;
             height: 100%;
             border-radius: inherit;
-            background: linear-gradient(90deg,rgba(255,174,0,1),rgba(255,255,255,1));
+            background: linear-gradient(
+                95deg,
+                rgb(86, 171, 183) 0%,
+                rgb(86, 171, 183) 70%,
+                rgb(57, 232, 255) 100%
+            );
             transition: width .3s ease-out;
+        }
+
+        #ProcessPercent {
+            font-size: clamp(20px,2.3vw,32px);
+            margin-top: 2vh;
+            text-shadow: 0 0 8px rgba(0,0,0,.9);
         }
 
         @keyframes GlowLogo {
@@ -157,35 +162,38 @@
         </div>
         
         <div id="FooterBlock">
-            <div id="HintTitle">ПОДСКАЗКИ</div>
+            <div id="HintTitle">ИНТЕРЕСНЫЕ ФАКТЫ</div>
             <div id="HintText">Некий Тамерлан-Куки проник в ваш компьютер...</div>
         </div>
 
         <div id="CenterLoadingBlock">
             <div id="ProcessName">Подготовка загрузки...</div>
-            <div id="ProcessPercent">0%</div>
             <div id="ProcessBar">
                 <div id="ProcessBarFill"></div>
             </div>
+            <!-- <div id="ProcessPercent">0%</div> -->
         </div>
+
+        <audio id="BackgroundMusicAudio" src="sounds/backmusic.mp3" loop controls></audio>
     </div>
 
     <script>
         const HintCollectionArray = [
-            "ДЫХАНИЕ ВОДЫ - СИЛА В СПОКОЙСТВИИ И ТЕЧЕНИИ, КАК РЕКА",
-            "НИКОГДА НЕ ПРЕКРАЩАЙТЕ ТРЕНИРОВАТЬСЯ - СИЛА НЕ ПРИХОДИТ БЕЗ УСИЛИЙ",
-            "НИЧИРИН НЕ ДАСТСЯ ЛЕГКО - ЕГО СИЛА ТРЕБУЕТ ЖЕРТВ",
-            "МЕЧ ИСКУПЛЕНИЯ - ПУТЬ УБИЙЦЫ ДЕМОНОВ ВЕДЁТ К СПАСЕНИЮ",
-            "ЗАПАХ КРОВИ ПРИВЛЕКАЕТ ДЕМОНОВ - БУДЬТЕ ОСТОРОЖНЫ В БИТВЕ",
-            "ВСЕЛЕННАЯ ПОЛНА ДЕМОНОВ - ВЕЧНАЯ БИТВА МЕЖДУ СВЕТОМ И ТЬМОЙ",
-            "СТРЕМЛЕНИЕ - КЛЮЧ К СИЛЕ, НО И К ПРОКЛЯТИЮ",
-            "КАЖДЫЙ ИЗНАШИВАЕТ МЕЧ СВОИМ УНИКАЛЬНЫМ СТИЛЕМ",
-            "ДЕМОНЫ БОЯТСЯ СОЛНЦА - ИСПОЛЬЗУЙТЕ ЭТО В СВОЮ ПОЛЬЗУ",
-            "СИЛА СЕМЬИ - ВЕЛИЧАЙШАЯ ОПОРА В БОРЬБЕ С ТЬМОЙ",
-            "НИКОГДА НЕ СДАВАЙТЕСЬ - ДАЖЕ ПЕРЕД ЛИЦОМ НЕВОЗМОЖНОГО",
-            "ИСТИННАЯ СИЛА ПРИХОДИТ ИЗ ЛЮБВИ И ЗАЩИТЫ БЛИЗКИХ",
-            "ПУТЬ ИСТРЕБИТЕЛЯ ДЕМОНОВ - ЭТО ПУТЬ ОДИНОЧЕСТВА И ЖЕРТВЫ",
-            "СЛУШАЙТЕ СВОЁ СЕРДЦЕ - ОНО ПОДСКАЖЕТ ПРАВИЛЬНЫЙ ПУТЬ"
+            "ВОЗМОЖНО КОГДА-ТО НА ЭТОТ СЕРВЕР ЗАЙДУТ ФРАНЦУЗЫ :]",
+            "КОГДА-ТО ВСЁ БЫЛО ПРЕКРАСНО, НО ТЕПЕРЬ ВСЁ ЕЩЁ ЛУЧШЕ!",
+            "ПРАКТИЧЕСКИ ВСЕ НАШИ РАБОТНИКИ ОТКРЫТЫ К ПРЕДЛОЖЕНИЯМ, НЕ СТЕСНЯЙТЕСЬ.",
+            "РАНО ИЛИ ПОЗДНО МЫ НАЧНЁМ ЗАНИМАТЬСЯ РЕВОРКАМИ :D",
+            "ЕСЛИ ЭТОТ ЭКРАН ДОЛГО ЗАГРУЖАЕТСЯ — НЕ ПАНИКУЙТЕ, ТАК И ЗАДУМАНО.",
+            "ГОВОРЯТ, ЧТО ЛУЧШЕ ВСЕГО ИГРАЕТСЯ ТАМ, ГДЕ НЕ ЛАГАЕТ… К СОЖАЛЕНИЮ, ЭТО НЕ ПРО НАС.",
+            "НАШ СЕРВЕР НАСТОЛЬКО КОМФОРТНЫЙ, ЧТО НЕКОТОРЫЕ БАГИ ЖИВУТ ТУТ ГОДАМИ.",
+            "КОГДА-НИБУДЬ МЫ ДОБАВИМ НОВЫЙ КОНТЕНТ… НАПРИМЕР, НОРМАЛЬНЫЕ МК ДЕМОНАМ.",
+            "ЕСЛИ ВЫ УВИДЕЛИ ЧТО-ТО СТРАННОЕ — ТАК И ДОЛЖНО БЫТЬ. МЫ ТАК ЗАДУМАЛИ.",
+            "СЕРВЕР МОЖЕТ НЕ ВСЁ ОБЕЩАТЬ, НО СТАБИЛЬНЫЕ КРАШИ — ГАРАНТИЯ.",
+            "НАШ ДИЗАЙНЕР ГЕНИЙ. ОН САМ ТАК ГОВОРИТ.",
+            "В БУДУЩЕМ МЫ ПЛАНИРУЕМ ДОРАБОТАТЬ МНОГОЕ...",
+            "ЕСЛИ ВЫ ЭТО ЧИТАЕТЕ — ВЫ УЖЕ ЗАГРУЖАЕТЕСЬ ЛУЧШЕ, ЧЕМ БОЛЬШИНСТВО.",
+            "НЕ БОЙТЕСЬ ОБРАЩАТЬСЯ К АДМИНАМ — ОНИ НЕ КУСАЮТСЯ… ЧАСТО.",
+            "ЕСЛИ ОСВЕЩЕНИЕ НАШЕЙ КАРТЫ ЖГЁТ ВАМ ГЛАЗА, ТО ЭТО ПЕЧАЛЬНО."
         ];
 
         const BackgroundCollectionArray = [
@@ -197,9 +205,9 @@
 
         let CurrentBackgroundIndexValue = 0;
         let CurrentHintIndexValue = 0;
-
         let FilesTotalAmountValue = 0;
         let FilesNeededAmountValue = 0;
+        let HintTypingIntervalIdentifierValue = null;
 
         function GetNextBackgroundIndexValue() {
             let NextBackgroundIndexValue;
@@ -217,35 +225,51 @@
             return NextHintIndexValue;
         }
 
+        function StartHintTypingText(NewHintTextValue) {
+            const HintTextElement = document.getElementById("HintText");
+            if (!HintTextElement) return;
+            if (HintTypingIntervalIdentifierValue) {
+                clearInterval(HintTypingIntervalIdentifierValue);
+                HintTypingIntervalIdentifierValue = null;
+            }
+            HintTextElement.textContent = "";
+            HintTextElement.style.opacity = "0.5";
+            let CurrentCharIndexValue = 0;
+            HintTypingIntervalIdentifierValue = setInterval(function() {
+                if (CurrentCharIndexValue >= NewHintTextValue.length) {
+                    clearInterval(HintTypingIntervalIdentifierValue);
+                    HintTypingIntervalIdentifierValue = null;
+                    return;
+                }
+                HintTextElement.textContent += NewHintTextValue.charAt(CurrentCharIndexValue);
+                CurrentCharIndexValue++;
+            },35);
+        }
+
         function UpdateVisualContentBlock() {
             const HintTextElement = document.getElementById("HintText");
             const BackgroundImageElement = document.getElementById("BackgroundImage");
-            
+            if (!HintTextElement || !BackgroundImageElement) return;
             HintTextElement.style.opacity = "0";
             BackgroundImageElement.classList.remove("ActiveBackground");
-            
             setTimeout(function() {
                 CurrentHintIndexValue = GetNextHintIndexValue();
                 CurrentBackgroundIndexValue = GetNextBackgroundIndexValue();
-                
-                HintTextElement.textContent = HintCollectionArray[CurrentHintIndexValue];
+                const NewHintTextValue = HintCollectionArray[CurrentHintIndexValue];
                 BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
-                
-                setTimeout(function() {
-                    HintTextElement.style.opacity = "0.5";
-                    BackgroundImageElement.classList.add("ActiveBackground");
-                },50);
+                BackgroundImageElement.classList.add("ActiveBackground");
+                StartHintTypingText(NewHintTextValue);
             },1000);
         }
 
         function UpdateLoadingProgressLine() {
             const ProcessBarFillElement = document.getElementById("ProcessBarFill");
             const ProcessPercentElement = document.getElementById("ProcessPercent");
-            if (!ProcessBarFillElement || !ProcessPercentElement || FilesTotalAmountValue <= 0) return;
+            if (!ProcessBarFillElement || FilesTotalAmountValue <= 0) return;
             const CompletedPartValue = Math.max(0,Math.min(1,(FilesTotalAmountValue - FilesNeededAmountValue) / FilesTotalAmountValue));
             const PercentNumberValue = Math.round(CompletedPartValue * 100);
             ProcessBarFillElement.style.width = PercentNumberValue + "%";
-            ProcessPercentElement.textContent = PercentNumberValue + "%";
+            if (ProcessPercentElement) ProcessPercentElement.textContent = PercentNumberValue + "%";
         }
 
         function SetFilesTotal(TotalAmountValue) {
@@ -263,25 +287,40 @@
             if (ProcessNameElement) ProcessNameElement.textContent = StatusTextValue;
         }
 
+        let BackgroundMusicStartedFlagValue = false;
+
+        function StartBackgroundMusicPlayback() {
+            const BackgroundMusicAudioElement = document.getElementById("BackgroundMusicAudio");
+            if (!BackgroundMusicAudioElement || BackgroundMusicStartedFlagValue) return;
+            const PlayPromiseObjectValue = BackgroundMusicAudioElement.play();
+            if (PlayPromiseObjectValue && PlayPromiseObjectValue.catch) {
+                PlayPromiseObjectValue.catch(function() {});
+            }
+            BackgroundMusicStartedFlagValue = true;
+        }
+
         window.onload = function() {
             const BackgroundImageElement = document.getElementById("BackgroundImage");
             const HintTextElement = document.getElementById("HintText");
+            const BackgroundMusicAudioElement = document.getElementById("BackgroundMusicAudio");
 
             CurrentBackgroundIndexValue = Math.floor(Math.random() * BackgroundCollectionArray.length);
             BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
-            
+
             CurrentHintIndexValue = Math.floor(Math.random() * HintCollectionArray.length);
-            HintTextElement.textContent = HintCollectionArray[CurrentHintIndexValue];
-            
-            setTimeout(function() {
-                HintTextElement.style.opacity = "0.5";
-            },100);
-            
+            const InitialHintTextValue = HintCollectionArray[CurrentHintIndexValue];
+            StartHintTypingText(InitialHintTextValue);
+
+            if (BackgroundMusicAudioElement) {
+                BackgroundMusicAudioElement.volume = 0.35; // изменить громкость: значение от 0.0 до 1.0
+            }
+
+            document.addEventListener("click",StartBackgroundMusicPlayback);
+            document.addEventListener("keydown",StartBackgroundMusicPlayback);
+
             setInterval(UpdateVisualContentBlock,5500);
         };
+
     </script>
 </body>
 </html>
-
-
-
