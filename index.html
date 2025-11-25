@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Kamiko Loading Screen</title>
+    <style>
+        @font-face {
+            font-family: 'ExoSemiBold';
+            src: url('fonts/exo2-semibold.ttf') format('truetype');
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            background: #000;
+            font-family: 'ExoSemiBold';
+            display: flex;
+            flex-direction: column;
+        }
+
+        #VideoContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        #BackgroundImage,#UpperImage {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #BackgroundImage {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #BackgroundImage.ActiveBackground {
+            opacity: 1;
+        }
+
+        #UpperImage {
+            z-index: 1;
+        }
+
+        #HeaderBlock {
+            position: absolute;
+            top: 2.5vh;
+            right: 2.5vw;
+            z-index: 2;
+        }
+
+        #LogoImage {
+            width: 55px;
+            height: 88px;
+            filter: drop-shadow(0 0 5px rgba(255,174,0,0.5));
+            animation: GlowLogo 1.5s infinite alternate, SlideLeftLogo 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        #FooterBlock {
+            position: absolute;
+            bottom: 3vh;
+            left: 2vw;
+            z-index: 2;
+            max-width: 20vw;
+        }
+
+        #HintTitle {
+            font-size: clamp(16px,1.5vw,20px);
+            color: #fff;
+            margin-bottom: 1vh;
+            animation: SlideRightTitle 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        #HintText {
+            font-size: clamp(12px,1.1vw,16px);
+            color: #fff;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            max-width: 600px;
+        }
+
+        #CenterLoadingBlock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            z-index: 3;
+            width: 40vw;
+            max-width: 520px;
+            min-width: 260px;
+            text-align: center;
+            color: #fff;
+        }
+
+        #ProcessName {
+            font-size: clamp(14px,1.3vw,18px);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 1.2vh;
+            text-shadow: 0 0 6px rgba(0,0,0,.8);
+        }
+
+        #ProcessPercent {
+            font-size: clamp(20px,2.3vw,32px);
+            margin-bottom: 2vh;
+            text-shadow: 0 0 8px rgba(0,0,0,.9);
+        }
+
+        #ProcessBar {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.12);
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,.7);
+        }
+
+        #ProcessBarFill {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg,rgba(255,174,0,1),rgba(255,255,255,1));
+            transition: width .3s ease-out;
+        }
+
+        @keyframes GlowLogo {
+            from { filter: drop-shadow(0 0 2.5px rgba(149,206,200,.9)); }
+            to { filter: drop-shadow(0 0 5px rgba(33,45,44,0)); }
+        }
+
+        @keyframes SlideRightTitle {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes SlideLeftLogo {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="VideoContainer">
+        <img id="BackgroundImage" class="ActiveBackground">
+        <img id="UpperImage" src="img/kamiko_upper.png">
+        
+        <div id="HeaderBlock">
+            <img id="LogoImage" src="img/kamiko_logo.png">
+        </div>
+        
+        <div id="FooterBlock">
+            <div id="HintTitle">ПОДСКАЗКИ</div>
+            <div id="HintText">Некий Тамерлан-Куки проник в ваш компьютер...</div>
+        </div>
+
+        <div id="CenterLoadingBlock">
+            <div id="ProcessName">Подготовка загрузки...</div>
+            <div id="ProcessPercent">0%</div>
+            <div id="ProcessBar">
+                <div id="ProcessBarFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const HintCollectionArray = [
+            "ДЫХАНИЕ ВОДЫ - СИЛА В СПОКОЙСТВИИ И ТЕЧЕНИИ, КАК РЕКА",
+            "НИКОГДА НЕ ПРЕКРАЩАЙТЕ ТРЕНИРОВАТЬСЯ - СИЛА НЕ ПРИХОДИТ БЕЗ УСИЛИЙ",
+            "НИЧИРИН НЕ ДАСТСЯ ЛЕГКО - ЕГО СИЛА ТРЕБУЕТ ЖЕРТВ",
+            "МЕЧ ИСКУПЛЕНИЯ - ПУТЬ УБИЙЦЫ ДЕМОНОВ ВЕДЁТ К СПАСЕНИЮ",
+            "ЗАПАХ КРОВИ ПРИВЛЕКАЕТ ДЕМОНОВ - БУДЬТЕ ОСТОРОЖНЫ В БИТВЕ",
+            "ВСЕЛЕННАЯ ПОЛНА ДЕМОНОВ - ВЕЧНАЯ БИТВА МЕЖДУ СВЕТОМ И ТЬМОЙ",
+            "СТРЕМЛЕНИЕ - КЛЮЧ К СИЛЕ, НО И К ПРОКЛЯТИЮ",
+            "КАЖДЫЙ ИЗНАШИВАЕТ МЕЧ СВОИМ УНИКАЛЬНЫМ СТИЛЕМ",
+            "ДЕМОНЫ БОЯТСЯ СОЛНЦА - ИСПОЛЬЗУЙТЕ ЭТО В СВОЮ ПОЛЬЗУ",
+            "СИЛА СЕМЬИ - ВЕЛИЧАЙШАЯ ОПОРА В БОРЬБЕ С ТЬМОЙ",
+            "НИКОГДА НЕ СДАВАЙТЕСЬ - ДАЖЕ ПЕРЕД ЛИЦОМ НЕВОЗМОЖНОГО",
+            "ИСТИННАЯ СИЛА ПРИХОДИТ ИЗ ЛЮБВИ И ЗАЩИТЫ БЛИЗКИХ",
+            "ПУТЬ ИСТРЕБИТЕЛЯ ДЕМОНОВ - ЭТО ПУТЬ ОДИНОЧЕСТВА И ЖЕРТВЫ",
+            "СЛУШАЙТЕ СВОЁ СЕРДЦЕ - ОНО ПОДСКАЖЕТ ПРАВИЛЬНЫЙ ПУТЬ"
+        ];
+
+        const BackgroundCollectionArray = [
+            "img/background1.png",
+            "img/background2.png",
+            "img/background3.png",
+            "img/background4.png"
+        ];
+
+        let CurrentBackgroundIndexValue = 0;
+        let CurrentHintIndexValue = 0;
+
+        let FilesTotalAmountValue = 0;
+        let FilesNeededAmountValue = 0;
+
+        function GetNextBackgroundIndexValue() {
+            let NextBackgroundIndexValue;
+            do {
+                NextBackgroundIndexValue = Math.floor(Math.random() * BackgroundCollectionArray.length);
+            } while (NextBackgroundIndexValue === CurrentBackgroundIndexValue && BackgroundCollectionArray.length > 1);
+            return NextBackgroundIndexValue;
+        }
+
+        function GetNextHintIndexValue() {
+            let NextHintIndexValue;
+            do {
+                NextHintIndexValue = Math.floor(Math.random() * HintCollectionArray.length);
+            } while (NextHintIndexValue === CurrentHintIndexValue && HintCollectionArray.length > 1);
+            return NextHintIndexValue;
+        }
+
+        function UpdateVisualContentBlock() {
+            const HintTextElement = document.getElementById("HintText");
+            const BackgroundImageElement = document.getElementById("BackgroundImage");
+            
+            HintTextElement.style.opacity = "0";
+            BackgroundImageElement.classList.remove("ActiveBackground");
+            
+            setTimeout(function() {
+                CurrentHintIndexValue = GetNextHintIndexValue();
+                CurrentBackgroundIndexValue = GetNextBackgroundIndexValue();
+                
+                HintTextElement.textContent = HintCollectionArray[CurrentHintIndexValue];
+                BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
+                
+                setTimeout(function() {
+                    HintTextElement.style.opacity = "0.5";
+                    BackgroundImageElement.classList.add("ActiveBackground");
+                },50);
+            },1000);
+        }
+
+        function UpdateLoadingProgressLine() {
+            const ProcessBarFillElement = document.getElementById("ProcessBarFill");
+            const ProcessPercentElement = document.getElementById("ProcessPercent");
+            if (!ProcessBarFillElement || !ProcessPercentElement || FilesTotalAmountValue <= 0) return;
+            const CompletedPartValue = Math.max(0,Math.min(1,(FilesTotalAmountValue - FilesNeededAmountValue) / FilesTotalAmountValue));
+            const PercentNumberValue = Math.round(CompletedPartValue * 100);
+            ProcessBarFillElement.style.width = PercentNumberValue + "%";
+            ProcessPercentElement.textContent = PercentNumberValue + "%";
+        }
+
+        function SetFilesTotal(TotalAmountValue) {
+            FilesTotalAmountValue = parseInt(TotalAmountValue) || 0;
+            UpdateLoadingProgressLine();
+        }
+
+        function SetFilesNeeded(NeededAmountValue) {
+            FilesNeededAmountValue = parseInt(NeededAmountValue) || 0;
+            UpdateLoadingProgressLine();
+        }
+
+        function SetStatusChanged(StatusTextValue) {
+            const ProcessNameElement = document.getElementById("ProcessName");
+            if (ProcessNameElement) ProcessNameElement.textContent = StatusTextValue;
+        }
+
+        window.onload = function() {
+            const BackgroundImageElement = document.getElementById("BackgroundImage");
+            const HintTextElement = document.getElementById("HintText");
+
+            CurrentBackgroundIndexValue = Math.floor(Math.random() * BackgroundCollectionArray.length);
+            BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
+            
+            CurrentHintIndexValue = Math.floor(Math.random() * HintCollectionArray.length);
+            HintTextElement.textContent = HintCollectionArray[CurrentHintIndexValue];
+            
+            setTimeout(function() {
+                HintTextElement.style.opacity = "0.5";
+            },100);
+            
+            setInterval(UpdateVisualContentBlock,5500);
+        };
+    </script>
+</body>
+</html>
