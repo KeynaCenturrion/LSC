@@ -272,7 +272,18 @@
         function UpdateLoadingProgressLine() {
             const ProcessBarFillElement = document.getElementById("ProcessBarFill");
             const ProcessPercentElement = document.getElementById("ProcessPercent");
-            if (!ProcessBarFillElement || FilesTotalAmountValue <= 0) return;
+            if (!ProcessBarFillElement) return;
+
+            if (FilesTotalAmountValue <= 0) {
+                if (FilesNeededAmountValue > 0) {
+                    FilesTotalAmountValue = FilesNeededAmountValue;
+                } else {
+                    ProcessBarFillElement.style.width = "0%";
+                    if (ProcessPercentElement) ProcessPercentElement.textContent = "0%";
+                    return;
+                }
+            }
+
             const CompletedPartValue = Math.max(0,Math.min(1,(FilesTotalAmountValue - FilesNeededAmountValue) / FilesTotalAmountValue));
             const PercentNumberValue = Math.round(CompletedPartValue * 100);
             ProcessBarFillElement.style.width = PercentNumberValue + "%";
@@ -328,5 +339,3 @@
     </script>
 </body>
 </html>
-
-
