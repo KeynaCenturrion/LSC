@@ -192,7 +192,7 @@
             "РАНО ИЛИ ПОЗДНО МЫ НАЧНЁМ ЗАНИМАТЬСЯ РЕВОРКАМИ :D",
             "ЕСЛИ ЭТОТ ЭКРАН ДОЛГО ЗАГРУЖАЕТСЯ — НЕ ПАНИКУЙТЕ, ТАК И ЗАДУМАНО.",
             "ГОВОРЯТ, ЧТО ЛУЧШЕ ВСЕГО ИГРАЕТСЯ ТАМ, ГДЕ НЕ ЛАГАЕТ… К СОЖАЛЕНИЮ, ЭТО НЕ ПРО НАС.",
-            "НАШ СЕРВЕР НАСТОЛЬКО КОМФОРТНЫЙ, ЧТО НЕКОТОРЫЕ БАГИ ЖИВУТ ТУТ ГОДАМИ.",
+            "НАШ СЕРВЕР НАСТОЛЬКИ КОМФОРТНЫЙ, ЧТО НЕКОТОРЫЕ БАГИ ЖИВУТ ТУТ ГОДАМИ.",
             "КОГДА-НИБУДЬ МЫ ДОБАВИМ НОВЫЙ КОНТЕНТ… НАПРИМЕР, НОРМАЛЬНЫЕ МК ДЕМОНАМ.",
             "ЕСЛИ ВЫ УВИДЕЛИ ЧТО-ТО СТРАННОЕ — ТАК И ДОЛЖНО БЫТЬ. МЫ ТАК ЗАДУМАЛИ.",
             "СЕРВЕР МОЖЕТ НЕ ВСЁ ОБЕЩАТЬ, НО СТАБИЛЬНЫЕ КРАШИ — ГАРАНТИЯ.",
@@ -215,7 +215,6 @@
         let HintTypingIntervalIdentifierValue = null;
         let BackgroundMusicStartedFlagValue = false;
         
-        // ГЛОБАЛЬНЫЙ ПРОГРЕСС АДДОНОВ
         let TotalAddonsValue = 0;
         let CompletedAddonsValue = 0;
         let TotalAddonBytesValue = 0;
@@ -251,7 +250,7 @@
             HintTextElement.style.opacity = "0.5";
             let CurrentCharIndexValue = 0;
             HintTypingIntervalIdentifierValue = setInterval(function() {
-                if (CurrentCharIndexIndexValue >= NewHintTextValue.length) {
+                if (CurrentCharIndexValue >= NewHintTextValue.length) {
                     clearInterval(HintTypingIntervalIdentifierValue);
                     HintTypingIntervalIdentifierValue = null;
                     return;
@@ -307,8 +306,7 @@
                 ProcessNameElement.textContent = "Подготовка загрузки...";
             }
             
-            AddonCountElement.textContent = 
-                `${CompletedAddonsValue}/${TotalAddonsValue} аддонов (${progressPercent}%)`;
+            AddonCountElement.textContent = `${CompletedAddonsValue}/${TotalAddonsValue} аддонов (${progressPercent}%)`;
         }
 
         function SetFilesTotal(TotalAmountValue) {
@@ -377,4 +375,3 @@
     </script>
 </body>
 </html>
-
