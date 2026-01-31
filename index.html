@@ -123,10 +123,18 @@
             border-radius: inherit;
             background: linear-gradient(
                 95deg,
-                rgb(145,134,255) 0%,
-                rgb(145,134,255) 70%,
-                rgb(185,179,255) 100%
+                rgb(86,171,183) 0%,
+                rgb(86,171,183) 70%,
+                rgb(57,232,255) 100%
             );
+            transition: none;
+            will-change: width;
+        }
+
+        #AddonCount {
+            font-size: clamp(12px,1.1vw,14px);
+            color: rgba(255,255,255,0.7);
+            margin-top: 0.5vh;
         }
 
         @keyframes GlowLogo {
@@ -164,6 +172,7 @@
             <div id="ProcessBar">
                 <div id="ProcessBarFill"></div>
             </div>
+            <div id="AddonCount">0/0 аддонов (0%)</div>
         </div>
 
         <audio
@@ -203,12 +212,17 @@
 
         let CurrentBackgroundIndexValue = 0;
         let CurrentHintIndexValue = 0;
-        let FilesTotalAmountValue = 0;
-        let FilesNeededAmountValue = 0;
         let HintTypingIntervalIdentifierValue = null;
         let BackgroundMusicStartedFlagValue = false;
-        let CurrentAddonName = "";
-        let IsStatusMode = false;
+        
+        // ГЛОБАЛЬНЫЙ ПРОГРЕСС АДДОНОВ
+        let TotalAddonsValue = 0;
+        let CompletedAddonsValue = 0;
+        let TotalAddonBytesValue = 0;
+        let DownloadedAddonBytesValue = 0;
+        let CurrentAddonNameValue = "";
+        let IsStatusModeValue = false;
+        let ActiveAddonsSet = new Set();
 
         function GetNextBackgroundIndexValue() {
             let NextBackgroundIndexValue;
@@ -237,7 +251,7 @@
             HintTextElement.style.opacity = "0.5";
             let CurrentCharIndexValue = 0;
             HintTypingIntervalIdentifierValue = setInterval(function() {
-                if (CurrentCharIndexValue >= NewHintTextValue.length) {
+                if (CurrentCharIndexIndexValue >= NewHintTextValue.length) {
                     clearInterval(HintTypingIntervalIdentifierValue);
                     HintTypingIntervalIdentifierValue = null;
                     return;
@@ -263,71 +277,84 @@
             },800);
         }
 
-        function UpdateLoadingProgressLine() {
+        function UpdateGlobalProgressDisplay() {
             const ProcessBarFillElement = document.getElementById("ProcessBarFill");
-            if (!ProcessBarFillElement) return;
-
-            let progress = 0;
+            const ProcessNameElement = document.getElementById("ProcessName");
+            const AddonCountElement = document.getElementById("AddonCount");
             
-            if (!IsStatusMode && FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
-                progress = 1 - (FilesNeededAmountValue / FilesTotalAmountValue);
-                progress = Math.max(0, Math.min(1, progress));
+            if (!ProcessBarFillElement || !ProcessNameElement || !AddonCountElement) return;
+
+            let overallProgress = 0;
+            
+            if (!IsStatusModeValue) {
+                if (TotalAddonsValue > 0) {
+                    const addonProgress = CompletedAddonsValue / TotalAddonsValue;
+                    const bytesProgress = TotalAddonBytesValue > 0 ? DownloadedAddonBytesValue / TotalAddonBytesValue : 0;
+                    overallProgress = (addonProgress + bytesProgress) / 2;
+                } else if (TotalAddonBytesValue > 0) {
+                    overallProgress = DownloadedAddonBytesValue / TotalAddonBytesValue;
+                }
             }
             
-            const PercentNumberValue = Math.round(progress * 100);
-            ProcessBarFillElement.style.width = PercentNumberValue + "%";
-            ProcessBarFillElement.style.transform = `scaleX(1)`;
+            const progressPercent = Math.round(Math.max(0, Math.min(1, overallProgress)) * 100);
+            ProcessBarFillElement.style.width = progressPercent + "%";
+            
+            if (CurrentAddonNameValue) {
+                ProcessNameElement.textContent = `Загрузка: ${CurrentAddonNameValue}`;
+            } else if (TotalAddonsValue > 0) {
+                ProcessNameElement.textContent = "Загрузка аддонов...";
+            } else {
+                ProcessNameElement.textContent = "Подготовка загрузки...";
+            }
+            
+            AddonCountElement.textContent = 
+                `${CompletedAddonsValue}/${TotalAddonsValue} аддонов (${progressPercent}%)`;
         }
 
         function SetFilesTotal(TotalAmountValue) {
-            FilesTotalAmountValue = Math.max(1, parseInt(TotalAmountValue) || 1);
-            IsStatusMode = false;
-            requestAnimationFrame(UpdateLoadingProgressLine);
+            TotalAddonBytesValue = Math.max(1, parseInt(TotalAmountValue) || 1);
+            IsStatusModeValue = false;
+            requestAnimationFrame(UpdateGlobalProgressDisplay);
         }
 
         function SetFilesNeeded(NeededAmountValue) {
-            FilesNeededAmountValue = parseInt(NeededAmountValue) || 0;
-            IsStatusMode = false;
-            requestAnimationFrame(UpdateLoadingProgressLine);
+            DownloadedAddonBytesValue = Math.max(0, TotalAddonBytesValue - (parseInt(NeededAmountValue) || 0));
+            IsStatusModeValue = false;
+            requestAnimationFrame(UpdateGlobalProgressDisplay);
         }
 
         function SetAddonDownload(addonName, totalBytes, downloadedBytes) {
-            CurrentAddonName = addonName || "";
-            IsStatusMode = false;
+            IsStatusModeValue = false;
+            CurrentAddonNameValue = addonName || "";
             
-            const total = Math.max(1, parseInt(totalBytes) || 1);
+            const addonId = addonName || "unknown";
+            
+            if (!ActiveAddonsSet.has(addonId)) {
+                ActiveAddonsSet.add(addonId);
+                TotalAddonsValue = ActiveAddonsSet.size;
+            }
+            
+            const total = parseInt(totalBytes) || 0;
             const downloaded = parseInt(downloadedBytes) || 0;
             
-            FilesTotalAmountValue = total;
-            FilesNeededAmountValue = Math.max(0, total - downloaded);
-            
-            const ProcessNameElement = document.getElementById("ProcessName");
-            if (ProcessNameElement) {
-                ProcessNameElement.textContent = CurrentAddonName ? `Загрузка: ${CurrentAddonName}` : "Подготовка загрузки...";
+            if (downloaded >= total && total > 0) {
+                CompletedAddonsValue = ActiveAddonsSet.size;
             }
-            requestAnimationFrame(UpdateLoadingProgressLine);
+            
+            DownloadedAddonBytesValue = Math.max(DownloadedAddonBytesValue, downloaded);
+            TotalAddonBytesValue = Math.max(TotalAddonBytesValue, total);
+            
+            requestAnimationFrame(UpdateGlobalProgressDisplay);
         }
 
         function SetStatusChanged(StatusTextValue) {
-            IsStatusMode = true;
+            IsStatusModeValue = true;
+            CurrentAddonNameValue = "";
             const ProcessNameElement = document.getElementById("ProcessName");
             if (ProcessNameElement) {
                 ProcessNameElement.textContent = StatusTextValue;
             }
-            const ProcessBarFillElement = document.getElementById("ProcessBarFill");
-            if (ProcessBarFillElement) {
-                ProcessBarFillElement.style.width = "0%";
-            }
-        }
-
-        function StartBackgroundMusicPlayback() {
-            const BackgroundMusicAudioElement = document.getElementById("BackgroundMusicAudio");
-            if (!BackgroundMusicAudioElement || BackgroundMusicStartedFlagValue) return;
-            const PlayPromiseObjectValue = BackgroundMusicAudioElement.play();
-            if (PlayPromiseObjectValue && PlayPromiseObjectValue.catch) {
-                PlayPromiseObjectValue.catch(function() {});
-            }
-            BackgroundMusicStartedFlagValue = true;
+            requestAnimationFrame(UpdateGlobalProgressDisplay);
         }
 
         window.onload = function() {
@@ -346,13 +373,7 @@
             }
 
             setInterval(UpdateVisualContentBlock,4500);
-            
-            const observer = new PerformanceObserver((list) => {
-                requestAnimationFrame(UpdateLoadingProgressLine);
-            });
-            observer.observe({entryTypes: ['frame']});
         };
     </script>
 </body>
 </html>
-
