@@ -127,7 +127,6 @@
                 rgb(86,171,183) 70%,
                 rgb(57,232,255) 100%
             );
-            transition: width .1s ease-out;
         }
 
         @keyframes GlowLogo {
@@ -209,7 +208,7 @@
         let HintTypingIntervalIdentifierValue = null;
         let BackgroundMusicStartedFlagValue = false;
         let CurrentAddonName = "";
-        let LastProgressValue = -1;
+        let IsStatusMode = false;
 
         function GetNextBackgroundIndexValue() {
             let NextBackgroundIndexValue;
@@ -245,7 +244,7 @@
                 }
                 HintTextElement.textContent += NewHintTextValue.charAt(CurrentCharIndexValue);
                 CurrentCharIndexValue++;
-            },35);
+            },25);
         }
 
         function UpdateVisualContentBlock() {
@@ -261,7 +260,7 @@
                 BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
                 BackgroundImageElement.classList.add("ActiveBackground");
                 StartHintTypingText(NewHintTextValue);
-            },1000);
+            },800);
         }
 
         function UpdateLoadingProgressLine() {
@@ -269,57 +268,55 @@
             if (!ProcessBarFillElement) return;
 
             let progress = 0;
-            if (FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
+            
+            if (!IsStatusMode && FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
                 progress = 1 - (FilesNeededAmountValue / FilesTotalAmountValue);
                 progress = Math.max(0, Math.min(1, progress));
-            } else {
-                progress = 0;
             }
             
             const PercentNumberValue = Math.round(progress * 100);
-            
-            if (Math.abs(PercentNumberValue - LastProgressValue) > 1 || FilesTotalAmountValue === 0) {
-                ProcessBarFillElement.style.width = PercentNumberValue + "%";
-                LastProgressValue = PercentNumberValue;
-                ProcessBarFillElement.style.transition = 'width 0.1s ease-out';
-            }
+            ProcessBarFillElement.style.width = PercentNumberValue + "%";
+            ProcessBarFillElement.style.transform = `scaleX(1)`;
         }
 
         function SetFilesTotal(TotalAmountValue) {
-            FilesTotalAmountValue = parseInt(TotalAmountValue) || 0;
-            UpdateLoadingProgressLine();
+            FilesTotalAmountValue = Math.max(1, parseInt(TotalAmountValue) || 1);
+            IsStatusMode = false;
+            requestAnimationFrame(UpdateLoadingProgressLine);
         }
 
         function SetFilesNeeded(NeededAmountValue) {
             FilesNeededAmountValue = parseInt(NeededAmountValue) || 0;
-            UpdateLoadingProgressLine();
+            IsStatusMode = false;
+            requestAnimationFrame(UpdateLoadingProgressLine);
         }
 
         function SetAddonDownload(addonName, totalBytes, downloadedBytes) {
             CurrentAddonName = addonName || "";
-            const total = parseInt(totalBytes) || 0;
+            IsStatusMode = false;
+            
+            const total = Math.max(1, parseInt(totalBytes) || 1);
             const downloaded = parseInt(downloadedBytes) || 0;
+            
             FilesTotalAmountValue = total;
-            FilesNeededAmountValue = total - downloaded;
+            FilesNeededAmountValue = Math.max(0, total - downloaded);
             
             const ProcessNameElement = document.getElementById("ProcessName");
             if (ProcessNameElement) {
                 ProcessNameElement.textContent = CurrentAddonName ? `Загрузка: ${CurrentAddonName}` : "Подготовка загрузки...";
             }
-            UpdateLoadingProgressLine();
+            requestAnimationFrame(UpdateLoadingProgressLine);
         }
 
         function SetStatusChanged(StatusTextValue) {
+            IsStatusMode = true;
             const ProcessNameElement = document.getElementById("ProcessName");
             if (ProcessNameElement) {
-                if (CurrentAddonName) {
-                    ProcessNameElement.textContent = `Загрузка: ${CurrentAddonName}`;
-                } else {
-                    ProcessNameElement.textContent = StatusTextValue;
-                    FilesTotalAmountValue = 0;
-                    FilesNeededAmountValue = 0;
-                    UpdateLoadingProgressLine();
-                }
+                ProcessNameElement.textContent = StatusTextValue;
+            }
+            const ProcessBarFillElement = document.getElementById("ProcessBarFill");
+            if (ProcessBarFillElement) {
+                ProcessBarFillElement.style.width = "0%";
             }
         }
 
@@ -348,7 +345,12 @@
                 BackgroundMusicAudioElement.volume = 0;
             }
 
-            setInterval(UpdateVisualContentBlock,5500);
+            setInterval(UpdateVisualContentBlock,4500);
+            
+            const observer = new PerformanceObserver((list) => {
+                requestAnimationFrame(UpdateLoadingProgressLine);
+            });
+            observer.observe({entryTypes: ['frame']});
         };
     </script>
 </body>
