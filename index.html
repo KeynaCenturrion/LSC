@@ -16,18 +16,15 @@
             height: 100vh;
             background: #000;
             font-family: 'ExoSemiBold';
-            display: flex;
-            flex-direction: column;
         }
 
         #VideoContainer {
             position: relative;
             width: 100%;
-            height: 100%;
-            flex-grow: 1;
+            height: 100vh;
         }
 
-        #BackgroundImage,#UpperImage {
+        #BackgroundVideo {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -35,16 +32,23 @@
             object-fit: cover;
         }
 
-        #BackgroundImage {
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-
-        #BackgroundImage.ActiveBackground {
-            opacity: 1;
+        #DarkenedVideo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: multiply;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
         }
 
         #UpperImage {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             z-index: 1;
         }
 
@@ -52,12 +56,12 @@
             position: absolute;
             top: 2.5vh;
             right: 2.5vw;
-            z-index: 2;
+            z-index: 10;
         }
 
         #LogoImage {
-            width: 55px;
-            height: 88px;
+            width: 82.5px;
+            height: 132px;
             filter: drop-shadow(0 0 5px rgba(255,174,0,0.5));
             animation: GlowLogo 1.5s infinite alternate, SlideLeftLogo 1s ease-out forwards;
             opacity: 0;
@@ -67,7 +71,7 @@
             position: absolute;
             bottom: 3vh;
             left: 2vw;
-            z-index: 2;
+            z-index: 10;
             max-width: 40vw;
         }
 
@@ -92,17 +96,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%,-50%);
-            z-index: 3;
-            width: 100vw;
-            max-width: 570px;
+            z-index: 20;
+            width: 300vw;
+            max-width: 70%;
             min-width: 260px;
             text-align: center;
             color: #fff;
         }
 
         #ProcessName {
-            font-size: clamp(14px,1.3vw,18px);
-            letter-spacing: .08em;
+            font-size: clamp(25px,1.3vw,18px);
+            letter-spacing: .2em;
             text-transform: uppercase;
             margin-bottom: 1.6vh;
             text-shadow: 0 0 6px rgba(0,0,0,.8);
@@ -110,7 +114,7 @@
 
         #ProcessBar {
             width: 100%;
-            height: 15px;
+            height: 20px;
             border-radius: 999px;
             background: rgba(255,255,255,.12);
             overflow: hidden;
@@ -121,14 +125,8 @@
             width: 0%;
             height: 100%;
             border-radius: inherit;
-            background: linear-gradient(
-                95deg,
-                rgb(148,139,254) 0%,
-                rgb(148,139,254) 70%,
-                rgb(185,179,255) 100%
-            );
+            background: linear-gradient(95deg, rgba(148, 139, 254, 1) 0%, rgba(148, 139, 254, 1) 70%, rgba(148, 139, 254, 1), 100%);
             transition: none;
-            will-change: width;
         }
 
         #AddonCount {
@@ -138,8 +136,8 @@
         }
 
         @keyframes GlowLogo {
-            from { filter: drop-shadow(0 0 2.5px rgba(149,206,200,.9)); }
-            to { filter: drop-shadow(0 0 5px rgba(33,45,44,0)); }
+            from { filter: drop-shadow(0 0 10px rgba(171, 163, 255, 1)); }
+            to { filter: drop-shadow(0 0 0px rgba(33,45,44,0)); }
         }
 
         @keyframes SlideRightTitle {
@@ -155,7 +153,8 @@
 </head>
 <body>
     <div id="VideoContainer">
-        <img id="BackgroundImage" class="ActiveBackground">
+        <video id="BackgroundVideo" src="Video/Background.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <div id="DarkenedVideo"></div>
         <img id="UpperImage" src="img/kamiko_upper.png">
         
         <div id="HeaderBlock">
@@ -172,76 +171,42 @@
             <div id="ProcessBar">
                 <div id="ProcessBarFill"></div>
             </div>
-            <div id="AddonCount">0/0 аддонов (0%)</div>
         </div>
 
-        <audio
-            id="BackgroundMusicAudio"
-            src="sounds/backmusic.mp3"
-            autoplay
-            loop
-            style="display:none"
-        ></audio>
+        <audio id="BackgroundMusicAudio" src="sounds/backmusic.mp3" autoplay loop style="display:none"></audio>
     </div>
 
     <script>
         const HintCollectionArray = [
-            "ВОЗМОЖНО КОГДА-ТО НА ЭТОТ СЕРВЕР ЗАЙДУТ ФРАНЦУЗЫ :]",
-            "КОГДА-ТО ВСЁ БЫЛО ПРЕКРАСНО, НО ТЕПЕРЬ ВСЁ ЕЩЁ ЛУЧШЕ!",
-            "ПРАКТИЧЕСКИ ВСЕ НАШИ РАБОТНИКИ ОТКРЫТЫ К ПРЕДЛОЖЕНИЯМ, НЕ СТЕСНЯЙТЕСЬ.",
-            "РАНО ИЛИ ПОЗДНО МЫ НАЧНЁМ ЗАНИМАТЬСЯ РЕВОРКАМИ :D",
-            "ЕСЛИ ЭТОТ ЭКРАН ДОЛГО ЗАГРУЖАЕТСЯ — НЕ ПАНИКУЙТЕ, ТАК И ЗАДУМАНО.",
-            "ГОВОРЯТ, ЧТО ЛУЧШЕ ВСЕГО ИГРАЕТСЯ ТАМ, ГДЕ НЕ ЛАГАЕТ… К СОЖАЛЕНИЮ, ЭТО НЕ ПРО НАС.",
-            "НАШ СЕРВЕР НАСТОЛЬКИ КОМФОРТНЫЙ, ЧТО НЕКОТОРЫЕ БАГИ ЖИВУТ ТУТ ГОДАМИ.",
-            "КОГДА-НИБУДЬ МЫ ДОБАВИМ НОВЫЙ КОНТЕНТ… НАПРИМЕР, НОРМАЛЬНЫЕ МК ДЕМОНАМ.",
-            "ЕСЛИ ВЫ УВИДЕЛИ ЧТО-ТО СТРАННОЕ — ТАК И ДОЛЖНО БЫТЬ. МЫ ТАК ЗАДУМАЛИ.",
-            "СЕРВЕР МОЖЕТ НЕ ВСЁ ОБЕЩАТЬ, НО СТАБИЛЬНЫЕ КРАШИ — ГАРАНТИЯ.",
-            "НАШ ДИЗАЙНЕР ГЕНИЙ. ОН САМ ТАК ГОВОРИТ.",
-            "В БУДУЩЕМ МЫ ПЛАНИРУЕМ ДОРАБОТАТЬ МНОГОЕ...",
-            "ЕСЛИ ВЫ ЭТО ЧИТАЕТЕ — ВЫ УЖЕ ЗАГРУЖАЕТЕСЬ ЛУЧШЕ, ЧЕМ БОЛЬШИНСТВО.",
-            "НЕ БОЙТЕСЬ ОБРАЩАТЬСЯ К АДМИНАМ — ОНИ НЕ КУСАЮТСЯ… ЧАСТО.",
-            "ЕСЛИ ОСВЕЩЕНИЕ НАШЕЙ КАРТЫ ЖГЁТ ВАМ ГЛАЗА, ТО ЭТО ПЕЧАЛЬНО."
+            "ВСЕ НАШИ РАБОТНИКИ ОТКРЫТЫ К ПРЕДЛОЖЕНИЯМ О РАБОТЕ, НЕ БОЙТЕСЬ ОБРАЩАТЬСЯ К КОМУ-ТО В ЛИЧНЫЕ СООБЩЕНИЯ.",
+            "НАСТУПАЕТ НЕКАЯ НОВАЯ ЭРА НА НАШЕМ ПРОЕКТЕ, МЫ ОЧЕНЬ РАДЫ ЛЮБОЙ ПОДДЕРЖКЕ.",
+            "ИНОГДА НАМ ДЕЙСТВИТЕЛЬНО НЕ ХВАТАЕТ РУК, ЕСЛИ ВЫ ОБЛАДАЕТЕ НАВЫКАМИ В ЛЮБОЙ ИЗ СФЕР, ТО ПИШИТЕ :^",
+            "МЫ УВАЖАЕМ НАШИХ ИГРОКОВ, РАДЫ ЧТО ОНИ ОСТАЮТСЯ ДАЖЕ В ПЛОХИЕ ВРЕМЕНА.",
+            "ПРОЕКТ ПЕРЕД ОТКРЫТИЕМ РАЗРАБАТЫВАЛСЯ ОКОЛО 6 МЕСЯЦЕВ, ПОЭТОМУ БАГИ - НЕ РЕДКОСТЬ.",
+            "МЫ ПЛАНИРУЕМ ДОБАВЛЯТЬ ГОРАЗДО БОЛЬШЕ НОВЫХ ФИШЕК, НЕЖЕЛИ ЧЕМ ЕСТЬ СЕЙЧАС.",
+            "КАЖДЫЙ ДЕНЬ МЫ ПРОСЫПАЕМСЯ С МЫСЛЬЮ О ММО РПГ 😎",
+            "СЕРВЕР ЗАТОЧЕН НА ПРОТИВОСТОЯНИЕ НЕСКОЛЬКИХ ФРАКЦИЙ, ПОЭТОМУ ВЫ ВСЕГДА СМОЖЕТЕ НАЙТИ СЕБЕ ПРОТИВНИКА. БИТВЫ НА ГАЛЬКЕ - НЕОБЯЗАТЕЛЬНЫ).",
+            "ИЗНАЧАЛЬНЫМ СОСТАВОМ СЕРВЕРА БЫЛИ ВСЕГО 2 ЧЕЛОВЕКА. ЭТО ВЕЛИКИЙ ДИЗАЙНЕР И МЕЛЧАЙШИЙ НА ТО ВРЕМЯ КОДЕР.",
+            'МЫ ПЛАНИРУЕМ РАСШИРЯТЬ НАШУ "ФРАНШИЗУ", ЖДИТЕ БОЛЬШЕ ПРОЕКТОВ ПО РАЗНЫМ ТЕМАТИКАМ'
         ];
 
-        const BackgroundCollectionArray = [
-            "img/background1.png",
-            "img/background2.png",
-            "img/background3.png",
-            "img/background4.png"
-        ];
+        let HintTypingIntervalIdentifierValue = null, FilesTotalAmountValue = 0, FilesNeededAmountValue = 0, CurrentAddonName = "";
+        let HintIndexValue = -1, UsedHintsSet = new Set();
 
-        let CurrentBackgroundIndexValue = 0;
-        let CurrentHintIndexValue = 0;
-        let HintTypingIntervalIdentifierValue = null;
-        let BackgroundMusicStartedFlagValue = false;
-        
-        let TotalAddonsValue = 0;
-        let CompletedAddonsValue = 0;
-        let TotalAddonBytesValue = 0;
-        let DownloadedAddonBytesValue = 0;
-        let CurrentAddonNameValue = "";
-        let IsStatusModeValue = false;
-        let ActiveAddonsSet = new Set();
-
-        function GetNextBackgroundIndexValue() {
-            let NextBackgroundIndexValue;
+        function GetNextUniqueHintIndexValue() {
+            if (UsedHintsSet.size === HintCollectionArray.length) {
+                UsedHintsSet.clear();
+            }
             do {
-                NextBackgroundIndexValue = Math.floor(Math.random() * BackgroundCollectionArray.length);
-            } while (NextBackgroundIndexValue === CurrentBackgroundIndexValue && BackgroundCollectionArray.length > 1);
-            return NextBackgroundIndexValue;
-        }
-
-        function GetNextHintIndexValue() {
-            let NextHintIndexValue;
-            do {
-                NextHintIndexValue = Math.floor(Math.random() * HintCollectionArray.length);
-            } while (NextHintIndexValue === CurrentHintIndexValue && HintCollectionArray.length > 1);
-            return NextHintIndexValue;
+                HintIndexValue = (HintIndexValue + 1 + Math.floor(Math.random() * HintCollectionArray.length)) % HintCollectionArray.length;
+            } while (UsedHintsSet.has(HintIndexValue));
+            UsedHintsSet.add(HintIndexValue);
+            return HintIndexValue;
         }
 
         function StartHintTypingText(NewHintTextValue) {
             const HintTextElement = document.getElementById("HintText");
-            if (!HintTextElement) return;
+            if (!HintTextElement || !NewHintTextValue) return;
             if (HintTypingIntervalIdentifierValue) {
                 clearInterval(HintTypingIntervalIdentifierValue);
                 HintTypingIntervalIdentifierValue = null;
@@ -249,128 +214,69 @@
             HintTextElement.textContent = "";
             HintTextElement.style.opacity = "0.5";
             let CurrentCharIndexValue = 0;
-            HintTypingIntervalIdentifierValue = setInterval(function() {
+            HintTypingIntervalIdentifierValue = setInterval(() => {
                 if (CurrentCharIndexValue >= NewHintTextValue.length) {
                     clearInterval(HintTypingIntervalIdentifierValue);
                     HintTypingIntervalIdentifierValue = null;
                     return;
                 }
-                HintTextElement.textContent += NewHintTextValue.charAt(CurrentCharIndexValue);
-                CurrentCharIndexValue++;
+                HintTextElement.textContent += NewHintTextValue.charAt(CurrentCharIndexValue++);
             },25);
         }
 
-        function UpdateVisualContentBlock() {
-            const HintTextElement = document.getElementById("HintText");
-            const BackgroundImageElement = document.getElementById("BackgroundImage");
-            if (!HintTextElement || !BackgroundImageElement) return;
-            HintTextElement.style.opacity = "0";
-            BackgroundImageElement.classList.remove("ActiveBackground");
-            setTimeout(function() {
-                CurrentHintIndexValue = GetNextHintIndexValue();
-                CurrentBackgroundIndexValue = GetNextBackgroundIndexValue();
-                const NewHintTextValue = HintCollectionArray[CurrentHintIndexValue];
-                BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
-                BackgroundImageElement.classList.add("ActiveBackground");
-                StartHintTypingText(NewHintTextValue);
-            },800);
-        }
-
-        function UpdateGlobalProgressDisplay() {
+        function UpdateLoadingProgressLine() {
             const ProcessBarFillElement = document.getElementById("ProcessBarFill");
             const ProcessNameElement = document.getElementById("ProcessName");
             const AddonCountElement = document.getElementById("AddonCount");
-            
             if (!ProcessBarFillElement || !ProcessNameElement || !AddonCountElement) return;
 
-            let overallProgress = 0;
-            
-            if (!IsStatusModeValue) {
-                if (TotalAddonsValue > 0) {
-                    const addonProgress = CompletedAddonsValue / TotalAddonsValue;
-                    const bytesProgress = TotalAddonBytesValue > 0 ? DownloadedAddonBytesValue / TotalAddonBytesValue : 0;
-                    overallProgress = (addonProgress + bytesProgress) / 2;
-                } else if (TotalAddonBytesValue > 0) {
-                    overallProgress = DownloadedAddonBytesValue / TotalAddonBytesValue;
-                }
+            let progress = 0;
+            if (FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
+                progress = 1 - (FilesNeededAmountValue / FilesTotalAmountValue);
             }
-            
-            const progressPercent = Math.round(Math.max(0, Math.min(1, overallProgress)) * 100);
+            const progressPercent = Math.round(Math.max(0, Math.min(1, progress)) * 100);
             ProcessBarFillElement.style.width = progressPercent + "%";
             
-            if (CurrentAddonNameValue) {
-                ProcessNameElement.textContent = `Загрузка: ${CurrentAddonNameValue}`;
-            } else if (TotalAddonsValue > 0) {
-                ProcessNameElement.textContent = "Загрузка аддонов...";
-            } else {
-                ProcessNameElement.textContent = "Подготовка загрузки...";
-            }
-            
-            AddonCountElement.textContent = `${CompletedAddonsValue}/${TotalAddonsValue} аддонов (${progressPercent}%)`;
+            ProcessNameElement.textContent = CurrentAddonName ? `Загрузка: ${CurrentAddonName}` : "Подготовка загрузки...";
+            AddonCountElement.textContent = `${progressPercent}%`;
         }
 
-        function SetFilesTotal(TotalAmountValue) {
-            TotalAddonBytesValue = Math.max(1, parseInt(TotalAmountValue) || 1);
-            IsStatusModeValue = false;
-            requestAnimationFrame(UpdateGlobalProgressDisplay);
-        }
+        window.SetFilesTotal = (TotalAmountValue) => {
+            FilesTotalAmountValue = Math.max(1, parseInt(TotalAmountValue) || 1);
+            UpdateLoadingProgressLine();
+        };
 
-        function SetFilesNeeded(NeededAmountValue) {
-            DownloadedAddonBytesValue = Math.max(0, TotalAddonBytesValue - (parseInt(NeededAmountValue) || 0));
-            IsStatusModeValue = false;
-            requestAnimationFrame(UpdateGlobalProgressDisplay);
-        }
+        window.SetFilesNeeded = (NeededAmountValue) => {
+            FilesNeededAmountValue = parseInt(NeededAmountValue) || 0;
+            UpdateLoadingProgressLine();
+        };
 
-        function SetAddonDownload(addonName, totalBytes, downloadedBytes) {
-            IsStatusModeValue = false;
-            CurrentAddonNameValue = addonName || "";
-            
-            const addonId = addonName || "unknown";
-            
-            if (!ActiveAddonsSet.has(addonId)) {
-                ActiveAddonsSet.add(addonId);
-                TotalAddonsValue = ActiveAddonsSet.size;
-            }
-            
-            const total = parseInt(totalBytes) || 0;
+        window.SetAddonDownload = (addonName, totalBytes, downloadedBytes) => {
+            CurrentAddonName = addonName || "";
+            const total = Math.max(1, parseInt(totalBytes) || 1);
             const downloaded = parseInt(downloadedBytes) || 0;
-            
-            if (downloaded >= total && total > 0) {
-                CompletedAddonsValue = ActiveAddonsSet.size;
-            }
-            
-            DownloadedAddonBytesValue = Math.max(DownloadedAddonBytesValue, downloaded);
-            TotalAddonBytesValue = Math.max(TotalAddonBytesValue, total);
-            
-            requestAnimationFrame(UpdateGlobalProgressDisplay);
-        }
+            FilesTotalAmountValue = total;
+            FilesNeededAmountValue = Math.max(0, total - downloaded);
+            UpdateLoadingProgressLine();
+        };
 
-        function SetStatusChanged(StatusTextValue) {
-            IsStatusModeValue = true;
-            CurrentAddonNameValue = "";
+        window.SetStatusChanged = (StatusTextValue) => {
+            CurrentAddonName = "";
             const ProcessNameElement = document.getElementById("ProcessName");
-            if (ProcessNameElement) {
-                ProcessNameElement.textContent = StatusTextValue;
-            }
-            requestAnimationFrame(UpdateGlobalProgressDisplay);
-        }
+            if (ProcessNameElement) ProcessNameElement.textContent = StatusTextValue;
+            const ProcessBarFillElement = document.getElementById("ProcessBarFill");
+            if (ProcessBarFillElement) ProcessBarFillElement.style.width = "0%";
+        };
 
-        window.onload = function() {
-            const BackgroundImageElement = document.getElementById("BackgroundImage");
-            const BackgroundMusicAudioElement = document.getElementById("BackgroundMusicAudio");
-
-            CurrentBackgroundIndexValue = Math.floor(Math.random() * BackgroundCollectionArray.length);
-            BackgroundImageElement.src = BackgroundCollectionArray[CurrentBackgroundIndexValue];
-
-            CurrentHintIndexValue = Math.floor(Math.random() * HintCollectionArray.length);
-            const InitialHintTextValue = HintCollectionArray[CurrentHintIndexValue];
-            StartHintTypingText(InitialHintTextValue);
-
-            if (BackgroundMusicAudioElement) {
-                BackgroundMusicAudioElement.volume = 0;
-            }
-
-            setInterval(UpdateVisualContentBlock,4500);
+        window.onload = () => {
+            const BackgroundVideoElement = document.getElementById("BackgroundVideo");
+            BackgroundVideoElement.play().catch(() => {});
+            
+            StartHintTypingText(HintCollectionArray[GetNextUniqueHintIndexValue()]);
+            
+            setInterval(() => {
+                StartHintTypingText(HintCollectionArray[GetNextUniqueHintIndexValue()]);
+            }, 4500);
         };
     </script>
 </body>
