@@ -127,13 +127,7 @@
                 rgb(86,171,183) 70%,
                 rgb(57,232,255) 100%
             );
-            transition: width .3s ease-out;
-        }
-
-        #ProcessPercent {
-            font-size: clamp(20px,2.3vw,32px);
-            margin-top: 2vh;
-            text-shadow: 0 0 8px rgba(0,0,0,.9);
+            transition: width .1s ease-out;
         }
 
         @keyframes GlowLogo {
@@ -215,6 +209,7 @@
         let HintTypingIntervalIdentifierValue = null;
         let BackgroundMusicStartedFlagValue = false;
         let CurrentAddonName = "";
+        let LastProgressValue = -1;
 
         function GetNextBackgroundIndexValue() {
             let NextBackgroundIndexValue;
@@ -275,11 +270,19 @@
 
             let progress = 0;
             if (FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
-                progress = Math.max(0, Math.min(1, 1 - FilesNeededAmountValue / FilesTotalAmountValue));
+                progress = 1 - (FilesNeededAmountValue / FilesTotalAmountValue);
+                progress = Math.max(0, Math.min(1, progress));
+            } else {
+                progress = 0;
             }
             
             const PercentNumberValue = Math.round(progress * 100);
-            ProcessBarFillElement.style.width = PercentNumberValue + "%";
+            
+            if (Math.abs(PercentNumberValue - LastProgressValue) > 1 || FilesTotalAmountValue === 0) {
+                ProcessBarFillElement.style.width = PercentNumberValue + "%";
+                LastProgressValue = PercentNumberValue;
+                ProcessBarFillElement.style.transition = 'width 0.1s ease-out';
+            }
         }
 
         function SetFilesTotal(TotalAmountValue) {
@@ -294,8 +297,11 @@
 
         function SetAddonDownload(addonName, totalBytes, downloadedBytes) {
             CurrentAddonName = addonName || "";
-            FilesTotalAmountValue = totalBytes || 0;
-            FilesNeededAmountValue = totalBytes - (downloadedBytes || 0);
+            const total = parseInt(totalBytes) || 0;
+            const downloaded = parseInt(downloadedBytes) || 0;
+            FilesTotalAmountValue = total;
+            FilesNeededAmountValue = total - downloaded;
+            
             const ProcessNameElement = document.getElementById("ProcessName");
             if (ProcessNameElement) {
                 ProcessNameElement.textContent = CurrentAddonName ? `Загрузка: ${CurrentAddonName}` : "Подготовка загрузки...";
@@ -310,6 +316,9 @@
                     ProcessNameElement.textContent = `Загрузка: ${CurrentAddonName}`;
                 } else {
                     ProcessNameElement.textContent = StatusTextValue;
+                    FilesTotalAmountValue = 0;
+                    FilesNeededAmountValue = 0;
+                    UpdateLoadingProgressLine();
                 }
             }
         }
