@@ -171,7 +171,6 @@
             <div id="ProcessBar">
                 <div id="ProcessBarFill"></div>
             </div>
-            <!-- <div id="ProcessPercent">0%</div> -->
         </div>
 
         <audio
@@ -272,23 +271,15 @@
 
         function UpdateLoadingProgressLine() {
             const ProcessBarFillElement = document.getElementById("ProcessBarFill");
-            const ProcessPercentElement = document.getElementById("ProcessPercent");
             if (!ProcessBarFillElement) return;
 
-            if (FilesTotalAmountValue <= 0) {
-                if (FilesNeededAmountValue > 0) {
-                    FilesTotalAmountValue = FilesNeededAmountValue;
-                } else {
-                    ProcessBarFillElement.style.width = "0%";
-                    if (ProcessPercentElement) ProcessPercentElement.textContent = "0%";
-                    return;
-                }
+            let progress = 0;
+            if (FilesTotalAmountValue > 0 && FilesNeededAmountValue >= 0) {
+                progress = Math.max(0, Math.min(1, 1 - FilesNeededAmountValue / FilesTotalAmountValue));
             }
-
-            const CompletedPartValue = Math.max(0,Math.min(1,(FilesTotalAmountValue - FilesNeededAmountValue) / FilesTotalAmountValue));
-            const PercentNumberValue = Math.round(CompletedPartValue * 100);
+            
+            const PercentNumberValue = Math.round(progress * 100);
             ProcessBarFillElement.style.width = PercentNumberValue + "%";
-            if (ProcessPercentElement) ProcessPercentElement.textContent = PercentNumberValue + "%";
         }
 
         function SetFilesTotal(TotalAmountValue) {
