@@ -215,6 +215,7 @@
         let FilesNeededAmountValue = 0;
         let HintTypingIntervalIdentifierValue = null;
         let BackgroundMusicStartedFlagValue = false;
+        let CurrentAddonName = "";
 
         function GetNextBackgroundIndexValue() {
             let NextBackgroundIndexValue;
@@ -300,9 +301,26 @@
             UpdateLoadingProgressLine();
         }
 
+        function SetAddonDownload(addonName, totalBytes, downloadedBytes) {
+            CurrentAddonName = addonName || "";
+            FilesTotalAmountValue = totalBytes || 0;
+            FilesNeededAmountValue = totalBytes - (downloadedBytes || 0);
+            const ProcessNameElement = document.getElementById("ProcessName");
+            if (ProcessNameElement) {
+                ProcessNameElement.textContent = CurrentAddonName ? `Загрузка: ${CurrentAddonName}` : "Подготовка загрузки...";
+            }
+            UpdateLoadingProgressLine();
+        }
+
         function SetStatusChanged(StatusTextValue) {
             const ProcessNameElement = document.getElementById("ProcessName");
-            if (ProcessNameElement) ProcessNameElement.textContent = StatusTextValue;
+            if (ProcessNameElement) {
+                if (CurrentAddonName) {
+                    ProcessNameElement.textContent = `Загрузка: ${CurrentAddonName}`;
+                } else {
+                    ProcessNameElement.textContent = StatusTextValue;
+                }
+            }
         }
 
         function StartBackgroundMusicPlayback() {
@@ -327,19 +345,11 @@
             StartHintTypingText(InitialHintTextValue);
 
             if (BackgroundMusicAudioElement) {
-                BackgroundMusicAudioElement.volume = 0; /* MARK SOUND */
+                BackgroundMusicAudioElement.volume = 0;
             }
-
-            /*StartBackgroundMusicPlayback();
-            document.addEventListener("click",StartBackgroundMusicPlayback);
-            document.addEventListener("keydown",StartBackgroundMusicPlayback);*/
 
             setInterval(UpdateVisualContentBlock,5500);
         };
     </script>
 </body>
 </html>
-
-
-
-
